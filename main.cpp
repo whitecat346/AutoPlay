@@ -73,22 +73,26 @@ int main(int argc, char** argv)
 	}
 
 	std::cout << "AutoPlay Release 0.2.4 \nRepository URL: https://github.com/whitecat346/AutoPlay" << std::endl;
+	std::cout << "\nConfig:\nFFPlay Path: " << cfg.at("ffplay-path") << "\nFile Path: " << cfg.at("file-path") << "command: " << cfg.at("command")
+		<< "start time: " << cfg.at("time").at("hour") << ":" << cfg.at("time").at("minute") << ":" << cfg.at("time").at("second") << std::endl;
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Hide Command Window
-	{
+	/*{
 		HWND hWnd = GetForegroundWindow();
 		ShowWindow(hWnd, SW_HIDE);
 		HRESULT hr;
 		ITaskbarList* p_t_taskbar_list;
 		hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList, (void**)&p_t_taskbar_list);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(400));
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 		if (SUCCEEDED(hr))
 		{
 			p_t_taskbar_list->HrInit();
 			p_t_taskbar_list->DeleteTab(hWnd);
 		}
-	}
+	}*/
 
 	// Out Of Date
 	cfg_time ct = {
@@ -121,8 +125,9 @@ int main(int argc, char** argv)
 	}
 
 	// Get Time
-	while (!GetSystemTime(tnnd))
+	while (true)
 	{
+		GetSystemTime(tnnd);
 		if (tnnd.tm_hour == ct.in_hour
 			&& tnnd.tm_min == ct.in_minute
 			&& tnnd.tm_sec == ct.in_second)
@@ -145,9 +150,9 @@ int main(int argc, char** argv)
 					while (true)
 					{
 						HWND hffplay = FindWindow(L"TXGuiFoundation", NULL);
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
 						if(!hffplay)
 						{
-							std::this_thread::sleep_for(std::chrono::milliseconds(200));
 							SendMessageA(hffplay, WM_CLOSE, 0, 0);
 						}
 						return 0;
