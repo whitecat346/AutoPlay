@@ -5,8 +5,8 @@
   "command": "-fs -loop 2 -an",
   "time": {
     "hour": 16,
-    "minute": 30,
-    "second": 0
+    "minute": 44,
+    "second": 30
   },
   "out-date": {
     "year": 2024,

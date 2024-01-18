@@ -149,11 +149,12 @@ int main(int argc, char** argv)
 				{
 					while (true)
 					{
-						HWND hffplay = FindWindow(L"TXGuiFoundation", NULL);
+						HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
 						std::this_thread::sleep_for(std::chrono::milliseconds(200));
-						if(!hffplay)
+						if(hqqMusic)
 						{
-							SendMessageA(hffplay, WM_CLOSE, 0, 0);
+							SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
+							DestroyWindow(hqqMusic);
 						}
 						return 0;
 					}
@@ -173,7 +174,6 @@ int main(int argc, char** argv)
 				std::cout << "Can not load video file!";
 				return 3;
 			}
-			return 0;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	}
