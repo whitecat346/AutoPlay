@@ -30,10 +30,12 @@ void ErrorExit(LPTSTR lpszFunction);
 // Send Close Window To QQMusic
 BOOL CALLBACK EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
 {
-	HWND hDefault = FindWindowExA(hwnd, 0, (LPCSTR)L"QBCoreAx", 0);
+	HWND hDefault = FindWindowEx(hwnd, 0, L"QBCoreAx", 0);
 	if (hDefault != 0)
 	{
-		SendMessage(hwnd, WM_CLOSE, 0, 0);
+		std::cout << "Test Message";
+		SendMessageW(hwnd, WM_CLOSE, 0, 0);
+	/*	DestroyWindow(hwnd);*/
 
 		return FALSE;
 	}
@@ -87,9 +89,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	SetConsoleTitle(L"AutoPlay");
 	std::cout << "AutoPlay Release 0.2.4 \nRepository URL: https://github.com/whitecat346/AutoPlay" << std::endl;
 	std::cout << "\nConfig:\nFFPlay Path: " << cfg.at("ffplay-path") << "\nFile Path: " << cfg.at("file-path") << "command: " << cfg.at("command")
-		<< "start time: " << cfg.at("time").at("hour") << ":" << cfg.at("time").at("minute") << ":" << cfg.at("time").at("second") << std::endl;
+		<< "\nstart time: " << cfg.at("time").at("hour") << ":" << cfg.at("time").at("minute") << ":" << cfg.at("time").at("second") << std::endl;
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
@@ -156,13 +159,16 @@ int main(int argc, char** argv)
 				STARTUPINFO si{ 0 };
 				PROCESS_INFORMATION pi;
 
+				EnumWindows(EnumWindowsProc, 0);
+
 				if (CreateProcess(fpath.c_str(),
 					(LPWSTR)((string2wstring(vpath)).c_str()),
 					0, 0, 0, 0, 0, 0,
 					&si, &pi
 				))
 				{
-					EnumWindows(EnumWindowsProc, 0);
+					// Use Less
+					// Reason: Too Many TXGuiFoundation
 					/*HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
 					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 					if(hqqMusic)
