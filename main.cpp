@@ -13,7 +13,7 @@
 #include <shobjidl_core.h>
 #include <locale>
 #include <codecvt>
-#include <io.h>
+#include <stdio.h>
 #include <strsafe.h>
 #include <thread>
 
@@ -25,6 +25,21 @@ inline void GetSystemTime(tm& tmd);
 inline std::wstring string2wstring(const std::string& mbs);
 inline std::string wstring2string(const std::wstring& wstr);
 void ErrorExit(LPTSTR lpszFunction);
+
+// Call Back Function
+// Send Close Window To QQMusic
+BOOL CALLBACK EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
+{
+	HWND hDefault = FindWindowExA(hwnd, 0, (LPCSTR)L"QBCoreAx", 0);
+	if (hDefault != 0)
+	{
+		SendMessage(hwnd, WM_CLOSE, 0, 0);
+
+		return FALSE;
+	}
+
+	return TRUE;
+}
 
 // Config Struce
 struct cfg_time
@@ -147,18 +162,15 @@ int main(int argc, char** argv)
 					&si, &pi
 				))
 				{
-					while (true)
+					EnumWindows(EnumWindowsProc, 0);
+					/*HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
+					std::this_thread::sleep_for(std::chrono::milliseconds(200));
+					if(hqqMusic)
 					{
-						EnumWindows(HideQQMusic, 0)
-							/*HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
-							std::this_thread::sleep_for(std::chrono::milliseconds(200));
-							if(hqqMusic)
-							{
-								SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
-								DestroyWindow(hqqMusic);
-							}*/
-							return 0;
-					}
+						SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
+						DestroyWindow(hqqMusic);
+					}*/
+					return 0;
 				}
 				else
 				{
@@ -229,17 +241,4 @@ void ErrorExit(LPTSTR lpszFunction)
 	LocalFree(lpMsgBuf);
 	LocalFree(lpDisplayBuf);
 	ExitProcess(dw);
-}
-
-BOOL CALLBACK HideQQMusic(_In_ HWND hwindow, _In_ LPARAM lParam)
-{
-	HWND hDefault = FindWindowEx(hwindow, 0, L"QBCoreAx", 0);
-	if (hDefault != 0)
-	{
-		SendMessageA(hDefault, WM_CLOSE, 0, 0);
-
-		return  FALSE;
-	}
-
-	return TRUE;
 }
