@@ -141,7 +141,7 @@ int main(int argc, char** argv)
 				STARTUPINFO si{ 0 };
 				PROCESS_INFORMATION pi;
 
-				if(CreateProcess(fpath.c_str(),
+				if (CreateProcess(fpath.c_str(),
 					(LPWSTR)((string2wstring(vpath)).c_str()),
 					0, 0, 0, 0, 0, 0,
 					&si, &pi
@@ -149,14 +149,15 @@ int main(int argc, char** argv)
 				{
 					while (true)
 					{
-						HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
-						std::this_thread::sleep_for(std::chrono::milliseconds(200));
-						if(hqqMusic)
-						{
-							SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
-							DestroyWindow(hqqMusic);
-						}
-						return 0;
+						EnumWindows(HideQQMusic, 0)
+							/*HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
+							std::this_thread::sleep_for(std::chrono::milliseconds(200));
+							if(hqqMusic)
+							{
+								SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
+								DestroyWindow(hqqMusic);
+							}*/
+							return 0;
 					}
 				}
 				else
@@ -228,4 +229,17 @@ void ErrorExit(LPTSTR lpszFunction)
 	LocalFree(lpMsgBuf);
 	LocalFree(lpDisplayBuf);
 	ExitProcess(dw);
+}
+
+BOOL CALLBACK HideQQMusic(_In_ HWND hwindow, _In_ LPARAM lParam)
+{
+	HWND hDefault = FindWindowEx(hwindow, 0, L"QBCoreAx", 0);
+	if (hDefault != 0)
+	{
+		SendMessageA(hDefault, WM_CLOSE, 0, 0);
+
+		return  FALSE;
+	}
+
+	return TRUE;
 }
