@@ -1,0 +1,19 @@
+{
+  "autoplay": true,
+  "ffplay-path": "C:\\Users\\yanyu\\Desktop\\Project\\Dynamic Wallpaper\\x64\\Release\\ffplay.exe",
+  "file-path": "C:\\Users\\yanyu\\Videos\\Neggyu.mkv",
+  "command": "-fs -loop 2 -an",
+  "time": {
+    "hour": 23,
+    "minute": 14,
+    "second": 30
+  },
+  "out-date": {
+    "year": 2024,
+    "month": 2,
+    "day": 1,
+    "hour": 1,
+    "minute": 1,
+    "second": 1
+  }
+}
