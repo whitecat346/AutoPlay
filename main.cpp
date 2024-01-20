@@ -159,6 +159,7 @@ int main(int argc, char** argv)
 				STARTUPINFO si{ 0 };
 				PROCESS_INFORMATION pi;
 
+				// Destroy QQMusic Window
 				EnumWindows(EnumWindowsProc, 0);
 
 				if (CreateProcess(fpath.c_str(),
