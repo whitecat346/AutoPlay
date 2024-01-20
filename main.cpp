@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Hide Command Window
-	/*{
+	{
 		HWND hWnd = GetForegroundWindow();
 		ShowWindow(hWnd, SW_HIDE);
 		HRESULT hr;
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 			p_t_taskbar_list->HrInit();
 			p_t_taskbar_list->DeleteTab(hWnd);
 		}
-	}*/
+	}
 
 	// Out Of Date
 	cfg_time ct = {
