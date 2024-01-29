@@ -64,8 +64,10 @@ int main(int argc, char** argv)
 	// Load config.json -> Get Time -> If at time: Run ffplay ( while )
 
 	SetConsoleTitle(L"AutoPlay");
-	HWND hWnd = GetForegroundWindow();
-	//HWND hWnd = FindWindow(NULL, L"AutoPlay");
+	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+	//HWND hWnd = GetForegroundWindow();
+	HWND hWnd = FindWindow(NULL, L"AutoPlay");
 
 	// Load Config
 	std::ifstream fileCfg("config.json");
@@ -171,7 +173,7 @@ int main(int argc, char** argv)
 					CloseHandle(pi.hThread);
 
 					// Close QQMusic Window
-					HWND hffplay;
+					HWND hffplay = NULL;
 
 					while (true)
 					{
@@ -185,6 +187,8 @@ int main(int argc, char** argv)
 								return 0;
 							}
 						hffplay = FindWindow(L"SDL_APP", NULL);
+
+						std::this_thread::sleep_for(std::chrono::milliseconds(200));
 					}
 					
 				}
