@@ -33,7 +33,6 @@ BOOL CALLBACK EnumWindowsProc(_In_ HWND hwnd, _In_ LPARAM lParam)
 	HWND hDefault = FindWindowEx(hwnd, 0, L"QBCoreAx", 0);
 	if (hDefault != 0)
 	{
-		std::cout << "Test Message";
 		SendMessageW(hwnd, WM_CLOSE, 0, 0);
 	/*	DestroyWindow(hwnd);*/
 
@@ -64,6 +63,10 @@ int main(int argc, char** argv)
 	// Work Tree
 	// Load config.json -> Get Time -> If at time: Run ffplay ( while )
 
+	SetConsoleTitle(L"AutoPlay");
+	HWND hWnd = GetForegroundWindow();
+	//HWND hWnd = FindWindow(NULL, L"AutoPlay");
+
 	// Load Config
 	std::ifstream fileCfg("config.json");
 	if (fileCfg.is_open() == false)
@@ -89,7 +92,6 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	SetConsoleTitle(L"AutoPlay");
 	std::cout << "AutoPlay Release 0.2.4 \nRepository URL: https://github.com/whitecat346/AutoPlay" << std::endl;
 	std::cout << "\nConfig:\nFFPlay Path: " << cfg.at("ffplay-path") << "\nFile Path: " << cfg.at("file-path") << "command: " << cfg.at("command")
 		<< "\nstart time: " << cfg.at("time").at("hour") << ":" << cfg.at("time").at("minute") << ":" << cfg.at("time").at("second") << std::endl;
@@ -97,19 +99,16 @@ int main(int argc, char** argv)
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Hide Command Window
-	{
-		HWND hWnd = GetForegroundWindow();
-		ShowWindow(hWnd, SW_HIDE);
-		HRESULT hr;
-		ITaskbarList* p_t_taskbar_list;
-		hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList, (void**)&p_t_taskbar_list);
+	ShowWindow(hWnd, SW_HIDE);
+	HRESULT hr;
+	ITaskbarList* p_t_taskbar_list;
+	hr = CoCreateInstance(CLSID_TaskbarList, NULL, CLSCTX_INPROC_SERVER, IID_ITaskbarList, (void**)&p_t_taskbar_list);
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(200));
-		if (SUCCEEDED(hr))
-		{
-			p_t_taskbar_list->HrInit();
-			p_t_taskbar_list->DeleteTab(hWnd);
-		}
+	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	if (SUCCEEDED(hr))
+	{
+		p_t_taskbar_list->HrInit();
+		p_t_taskbar_list->DeleteTab(hWnd);
 	}
 
 	// Out Of Date
@@ -152,6 +151,8 @@ int main(int argc, char** argv)
 		{
 			if (std::ifstream((std::string(cfg.at("file-path"))).c_str()).is_open())
 			{
+				ShowWindow(hWnd, SW_SHOW);
+				
 				std::string vpath;
 				std::wstring fpath(string2wstring(cfg.at("ffplay-path")));
 				vpath.append(" \"").append(cfg.at("file-path")).append("\" ").append(cfg.at("command"));
@@ -159,25 +160,33 @@ int main(int argc, char** argv)
 				STARTUPINFO si{ 0 };
 				PROCESS_INFORMATION pi;
 
-				// Destroy QQMusic Window
-				EnumWindows(EnumWindowsProc, 0);
-
 				if (CreateProcess(fpath.c_str(),
 					(LPWSTR)((string2wstring(vpath)).c_str()),
 					0, 0, 0, 0, 0, 0,
 					&si, &pi
 				))
 				{
-					// Use Less
-					// Reason: Too Many TXGuiFoundation
-					/*HWND hqqMusic = FindWindow(L"TXGuiFoundation", NULL);
-					std::this_thread::sleep_for(std::chrono::milliseconds(200));
-					if(hqqMusic)
+					// No C6335
+					CloseHandle(pi.hProcess);
+					CloseHandle(pi.hThread);
+
+					// Close QQMusic Window
+					HWND hffplay;
+
+					while (true)
 					{
-						SendMessageA(hqqMusic, WM_CLOSE, 0, 0);
-						DestroyWindow(hqqMusic);
-					}*/
-					return 0;
+						if(hffplay != NULL)
+							while (IsWindow(hffplay) && IsWindowVisible(hffplay))
+							{
+								EnumWindows(EnumWindowsProc, 0);
+
+								ShowWindow(hWnd, SW_HIDE);
+
+								return 0;
+							}
+						hffplay = FindWindow(L"SDL_APP", NULL);
+					}
+					
 				}
 				else
 				{
